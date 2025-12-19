@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Links</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+  <style>
+    :root {
+      --bg: #fafafa;
+      --text: #111;
+      --sub: #888;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", Roboto, "Noto Sans TC",
+                   system-ui, sans-serif;
+      line-height: 1.8;
+      letter-spacing: 0.03em;
+    }
+
+    /* 深色模式 */
+    body.dark {
+      --bg: #121212;
+      --text: #ddd;
+      --sub: #aaa;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 72px 24px 96px;
+    }
+
+    header {
+      margin-bottom: 64px;
+      text-align: left;
+      position: relative;
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 24px;
+      opacity: 0.85;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0 0 12px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+    }
+
+    .bio {
+      margin: 0;
+      font-size: 13px;
+      color: var(--sub);
+      max-width: 360px;
+      line-height: 1.9;
+      letter-spacing: 0.04em;
+    }
+
+    /* 群組標題 */
+    .group h2 {
+      font-size: 16px;
+      margin: 32px 0 16px; /* 原本 32px 0 16px */
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-align: left;
+    }
+    .group h2 i { margin-right: 0.4em; font-size: 1em; }
+
+    .gradient {
+      background: linear-gradient(90deg, #4facfe, #a64bf4); /* 藍紫漸層 */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    body.dark .gradient {
+      background: linear-gradient(90deg, #00c6ff, #00ff9d); /* 深色模式青綠漸層 */
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-link {
+      margin: 0.8em 0 0 1.5em ; /* 原本 0.8em 0 */
+      text-align: left;
+    }
+
+    .text-link a {
+      display: block;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 15px;
+      letter-spacing: 0.05em;
+      transition: opacity 0.3s;
+    }
+
+    .text-link a:hover { opacity: 0.45; }
+
+    .text-link p {
+      margin: 0.3em 0 0 1.5em; /* 左邊縮排 */
+      font-size: 13px;
+      color: var(--sub);
+      line-height: 1.9;
+      letter-spacing: 0.04em;
+    }
+    .text-link i { margin-right: 0.4em; font-size: 0.8em; }
+
+    footer {
+      margin-top: 48px;
+      font-size: 13px;
+      text-align: right;
+      color: var(--sub);
+    }
+
+    /* 切換深色模式按鈕 */
+    .toggle-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0.3em 0.6em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #0077cc;
+      color: white;
+      font-size: 0.8em;
+    }
+
+    /* Toast 提示 */
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    #toast.show { visibility: visible; opacity: 1; transform: translateY(-10px); }
+    #toast.hide { opacity: 0; transform: translateY(30px); visibility: hidden; }
+    #toast.Create { background: #0096fa; color: #fff; }
+    #toast.SNS   { background: #ff574d; color: #fff; }
+    #toast.Contact   { background: #444; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img class="avatar" src="https://picsum.photos/200" alt="頭像">
+      <h1>Fia</h1>
+      <p class="bio">Design / Create / Contact</p>
+      <button class="toggle-btn" onclick="toggleDarkMode()">🌙</button>
+    </header>
+
+    <div id="toast"></div>
+    <div id="groups"></div>
+
+    <footer>
+      © 2025 Fia
+    </footer>
+  </div>
+
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+    }
+  
+    // 平台資料陣列
+    const links = [
+      { name: "Github", url: "https://github.com/fianight", icon: "fa-brands fa-github fa-fw", desc: "倉庫", group: "Create", order: 1 },
+      { name: "Plurk", url: "https://www.plurk.com/fianight", icon: "fa-solid fa-comment fa-fw", desc: "日常", group: "SNS", order: 1 },
+      { name: "X (Twitter)", url: "https://x.com/fianight", icon: "fa-brands fa-x-twitter fa-fw", desc: "跟隨", group: "SNS", order: 2 },
+      { name: "Email", icon: "fa-solid fa-envelope fa-fw", desc: "聯絡", group: "Contact", order: 1, copy: "example@mail.com" }
+    ];
+  
+    // 群組標題用 Font Awesome icon
+    const groupIcons = {
+      "Create": "fa-solid fa-folder-open",
+      "SNS": "fa-solid fa-comments",
+      "Contact": "fa-solid fa-envelopes-bulk"
+    };
+  
+    const grouped = {};
+    links.forEach(link => {
+      if (!grouped[link.group]) grouped[link.group] = [];
+      grouped[link.group].push(link);
+    });
+  
+    const groupsContainer = document.getElementById('groups');
+    Object.keys(grouped).forEach(groupName => {
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'group';
+      const icon = groupIcons[groupName] || "";
+      groupDiv.innerHTML = `
+        <h2><i class="${icon} fa-fw"></i><span class="gradient">${groupName}</span></h2>
+        <div class="text-links"></div>
+      `;
+      groupsContainer.appendChild(groupDiv);
+  
+      grouped[groupName].sort((a, b) => a.order - b.order).forEach(link => {
+        const item = document.createElement('div');
+        item.className = 'text-link';
+        if (link.copy) {
+          item.innerHTML = `
+            <a href="#" onclick="copyToClipboard('${link.copy}', '${link.group}', event)">
+              <i class="${link.icon} fa-fw"></i> ${link.name}
+            </a>
+            <p>${link.desc}</p>
+          `;
+        } else {
+          item.innerHTML = `
+            <a href="${link.url}" target="_blank">
+              <i class="${link.icon} fa-fw"></i> ${link.name}
+            </a>
+            <p>${link.desc}</p>
+          `;
+        }
+        groupDiv.querySelector('.text-links').appendChild(item);
+      });
+    });
+  
+    function copyToClipboard(text, group, event) {
+      event.preventDefault();
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("已複製：" + text, group);
+      }).catch(err => {
+        console.error("複製失敗：", err);
+      });
+    }
+  
+    function showToast(message, group) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = "show " + group;
+      setTimeout(() => { toast.className = "hide " + group; }, 2500);
+      setTimeout(() => { toast.className = toast.className.replace("hide " + group, ""); }, 3500);
+    }
+  </script>
+
+</body>
+</html>
