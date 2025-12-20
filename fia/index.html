@@ -79,7 +79,7 @@
       letter-spacing: 0.05em;
       text-align: left;
     }
-    .group h2 i { margin-right: 0.4em; font-size: 1em; }
+    .group h2 i, .group h2 .emoji { margin-right: 0.4em; font-size: 1em; }
 
     .gradient {
       background: linear-gradient(90deg, #4facfe, #a64bf4); /* 藍紫漸層 */
@@ -132,7 +132,7 @@
       right: 0;
       padding: 0.3em 0.6em;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
       cursor: pointer;
       /* background: #0077cc; */
       /*color: white; */
@@ -159,6 +159,7 @@
     #toast.SNS   { background: #ff574d; color: #fff; }
     #toast.Contact   { background: #444; color: #fff; }
   </style>
+
 </head>
 <body>
   <div class="wrap">
@@ -177,82 +178,88 @@
     </footer>
   </div>
 
-  <script>
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark');
-    }
-  
-    // 平台資料陣列
-    const links = [
-      { name: "Github", url: "https://github.com/fianight", icon: "fa-brands fa-github fa-fw", desc: "倉庫", group: "Create", order: 1 },
-      { name: "Plurk", url: "https://www.plurk.com/fianight", icon: "fa-solid fa-comment fa-fw", desc: "日常", group: "SNS", order: 1 },
-      { name: "X (Twitter)", url: "https://x.com/fianight", icon: "fa-brands fa-x-twitter fa-fw", desc: "跟隨", group: "SNS", order: 2 },
-      { name: "Email", icon: "fa-solid fa-envelope fa-fw", desc: "聯絡", group: "Contact", order: 1, copy: "example@mail.com" }
-    ];
-  
-    // 群組標題用 Font Awesome icon
-    const groupIcons = {
-      "Create": "fa-solid fa-folder-open",
-      "SNS": "fa-solid fa-comments",
-      "Contact": "fa-solid fa-envelopes-bulk"
-    };
-  
-    const grouped = {};
-    links.forEach(link => {
-      if (!grouped[link.group]) grouped[link.group] = [];
-      grouped[link.group].push(link);
+<script>
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+  }
+
+  // 平台資料陣列
+  const links = [
+    { name: "Github", url: "https://github.com/fianight", icon: "fa-brands fa-github fa-fw", desc: "倉庫", group: "Create", order: 1 },
+    { name: "Plurk", url: "https://www.plurk.com/fianight", icon: "fa-solid fa-comment fa-fw", desc: "日常", group: "SNS", order: 1 },
+    { name: "X (Twitter)", url: "https://x.com/fianight", icon: "fa-brands fa-square-x-twitter fa-fw", desc: "跟隨", group: "SNS", order: 2 },
+    { name: "Email", icon: "fa-solid fa-envelope fa-fw", desc: "聯絡", group: "Contact", order: 1, copy: "example@mail.com" }
+  ];
+
+  // 群組標題用 Font Awesome icon
+  const groupIcons = {
+    "Create": "fa-solid fa-folder-open",
+    "SNS": "fa-solid fa-comments",
+    "Contact": "fa-solid fa-envelopes-bulk"
+  };
+
+  const grouped = {};
+  links.forEach(link => {
+    if (!grouped[link.group]) grouped[link.group] = [];
+    grouped[link.group].push(link);
+  });
+
+  const groupsContainer = document.getElementById('groups');
+  Object.keys(grouped).forEach(groupName => {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'group';
+    const icon = groupIcons[groupName] || "";
+
+    // 判斷是 Font Awesome class 還是 emoji
+    const iconHTML = icon.startsWith("fa-")
+      ? `<i class="${icon} fa-fw"></i>`
+      : `<span class="emoji">${icon}</span>`;
+
+    groupDiv.innerHTML = `
+      <h2>${iconHTML}<span class="gradient">${groupName}</span></h2>
+      <div class="text-links"></div>
+    `;
+    groupsContainer.appendChild(groupDiv);
+
+    grouped[groupName].sort((a, b) => a.order - b.order).forEach(link => {
+      const item = document.createElement('div');
+      item.className = 'text-link';
+      if (link.copy) {
+        item.innerHTML = `
+          <a href="#" onclick="copyToClipboard('${link.copy}', '${link.group}', event)">
+            <i class="${link.icon} fa-fw"></i> ${link.name}
+          </a>
+          <p>${link.desc}</p>
+        `;
+      } else {
+        item.innerHTML = `
+          <a href="${link.url}" target="_blank">
+            <i class="${link.icon} fa-fw"></i> ${link.name}
+          </a>
+          <p>${link.desc}</p>
+        `;
+      }
+      groupDiv.querySelector('.text-links').appendChild(item);
     });
-  
-    const groupsContainer = document.getElementById('groups');
-    Object.keys(grouped).forEach(groupName => {
-      const groupDiv = document.createElement('div');
-      groupDiv.className = 'group';
-      const icon = groupIcons[groupName] || "";
-      groupDiv.innerHTML = `
-        <h2><i class="${icon} fa-fw"></i><span class="gradient">${groupName}</span></h2>
-        <div class="text-links"></div>
-      `;
-      groupsContainer.appendChild(groupDiv);
-  
-      grouped[groupName].sort((a, b) => a.order - b.order).forEach(link => {
-        const item = document.createElement('div');
-        item.className = 'text-link';
-        if (link.copy) {
-          item.innerHTML = `
-            <a href="#" onclick="copyToClipboard('${link.copy}', '${link.group}', event)">
-              <i class="${link.icon} fa-fw"></i> ${link.name}
-            </a>
-            <p>${link.desc}</p>
-          `;
-        } else {
-          item.innerHTML = `
-            <a href="${link.url}" target="_blank">
-              <i class="${link.icon} fa-fw"></i> ${link.name}
-            </a>
-            <p>${link.desc}</p>
-          `;
-        }
-        groupDiv.querySelector('.text-links').appendChild(item);
-      });
+  });
+
+  function copyToClipboard(text, group, event) {
+    event.preventDefault();
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("已複製：" + text, group);
+    }).catch(err => {
+      console.error("複製失敗：", err);
     });
-  
-    function copyToClipboard(text, group, event) {
-      event.preventDefault();
-      navigator.clipboard.writeText(text).then(() => {
-        showToast("已複製：" + text, group);
-      }).catch(err => {
-        console.error("複製失敗：", err);
-      });
-    }
-  
-    function showToast(message, group) {
-      const toast = document.getElementById("toast");
-      toast.textContent = message;
-      toast.className = "show " + group;
-      setTimeout(() => { toast.className = "hide " + group; }, 2500);
-      setTimeout(() => { toast.className = toast.className.replace("hide " + group, ""); }, 3500);
-    }
-  </script>
+  }
+
+  function showToast(message, group) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = "show " + group;
+    setTimeout(() => { toast.className = "hide " + group; }, 2500);
+    setTimeout(() => { toast.className = toast.className.replace("hide " + group, ""); }, 3500);
+  }
+</script>
 
 </body>
 </html>
